@@ -18,7 +18,9 @@ class MainWindow : public QMainWindow
 
     QMenu *menuFile;
     QAction *actionOpen;
+    QAction *actionOpenReadOnly;
     QAction *actionSave;
+    QAction *actionQuit;
 
     QMenu *menuHelp;
     QAction *actionAbout;
@@ -31,11 +33,15 @@ public:
 
 private:
     void setupUI();
-    void showAboutWindow();
+
+    //UTILS
+    void loadFile(bool isReadOnly);
 
 public slots:
     void onMenuActionOpen();
+    void onMenuActionOpenReadOnly();
     void onMenuActionSave();
+    void onMenuActionQuit();
     void onMenuActionAbout();
 
 };
