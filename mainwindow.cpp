@@ -7,7 +7,9 @@
 //CONSTRUCTOR
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+      isReadOnlyLoaded(false),
+      doUseHotkeysPreset2(false)
 {
     setupUI();
 }
@@ -40,6 +42,12 @@ void MainWindow::setupUI()
     actionSave = new QAction(this);
     actionQuit = new QAction(this);
 
+//    actionNew->setShortcut(Qt::CTRL | Qt::Key_N);
+//    actionOpen->setShortcut(Qt::CTRL | Qt::Key_O);
+//    actionOpenReadOnly->setShortcut(Qt::CTRL | Qt::SHIFT| Qt::Key_O);
+//    actionSave->setShortcut(Qt::CTRL | Qt::Key_S);
+//    actionQuit->setShortcut(Qt::CTRL | Qt::Key_Q);
+
     menuFile->addAction(actionNew);
     menuFile->addAction(actionOpen);
     menuFile->addAction(actionOpenReadOnly);
@@ -55,6 +63,15 @@ void MainWindow::setupUI()
     menuLanguage->addAction(actionEnglish);
     menuLanguage->addAction(actionRussian);
 
+    //HOTKEYS MENU
+    menuHotkeys = new QMenu(menubar);
+
+    actionHotkeysPreset1 = new QAction(this);
+    actionHotkeysPreset2 = new QAction(this);
+
+    menuHotkeys->addAction(actionHotkeysPreset1);
+    menuHotkeys->addAction(actionHotkeysPreset2);
+
     //HELP MENU
     menuHelp = new QMenu(menubar);
 
@@ -65,6 +82,7 @@ void MainWindow::setupUI()
     //------------
     menubar->addAction(menuFile->menuAction());
     menubar->addAction(menuLanguage->menuAction());
+    menubar->addAction(menuHotkeys->menuAction());
     menubar->addAction(menuHelp->menuAction());
 
     setMenuBar(menubar);
@@ -77,6 +95,9 @@ void MainWindow::setupUI()
 
     QWidget::connect(actionEnglish, &QAction::triggered, this, &MainWindow::onMenuActionEnglish);
     QWidget::connect(actionRussian, &QAction::triggered, this, &MainWindow::onMenuActionRussian);
+
+    QWidget::connect(actionHotkeysPreset1, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset1);
+    QWidget::connect(actionHotkeysPreset2, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset2);
 
     QWidget::connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
 
@@ -92,12 +113,10 @@ void MainWindow::loadFile(const bool isReadOnly)
 {
     QString openFilePath = QFileDialog::getOpenFileName(
                 this,
-                tr("Open file"),
+                isReadOnly? tr("Open read only file") : tr("Open file"),
                 QDir::current().path(),
                 tr("Text file (*.txt)")
     );
-
-    qDebug() << openFilePath;
 
     if (openFilePath.isEmpty())
         return;
@@ -113,12 +132,14 @@ void MainWindow::loadFile(const bool isReadOnly)
             setWindowTitle(tr("TextEd - **READ ONLY** ") + QFileInfo(openFilePath).fileName());
             actionSave->setDisabled(true);
             textEdit->setReadOnly(true);
+            isReadOnlyLoaded = true;
         }
         else
         {
             setWindowTitle("TextEd - " + QFileInfo(openFilePath).fileName());
             actionSave->setDisabled(false);
             textEdit->setReadOnly(false);
+            isReadOnlyLoaded = false;
         }
     }
 }
@@ -152,11 +173,68 @@ void MainWindow::setElementsStrings()
     actionOpenReadOnly->setText(tr("Open Read Only"));
     actionSave->setText(tr("Save"));
     actionQuit->setText(tr("Quit"));
+
     menuLanguage->setTitle(tr("Language"));
     actionEnglish->setText(tr("English"));
     actionRussian->setText(tr("Russian"));
+
+    menuHotkeys->setTitle(tr("Hotkeys Setup"));
+    actionHotkeysPreset1->setText(tr("Preset 1"));
+    actionHotkeysPreset2->setText(tr("Preset 2"));
+
     menuHelp->setTitle(tr("Help"));
     actionAbout->setText(tr("About"));
+}
+
+void MainWindow::processEventByPreset1(QKeyEvent *event)
+{
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+        switch (event->key())
+        {
+            case Qt::Key_N:
+                qDebug("CTRL+N");
+                onMenuActionNew();
+            break;
+            case Qt::Key_O:
+                if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+                {
+                    qDebug("CTRL+SHIFT+O");
+                    onMenuActionOpenReadOnly();
+                }
+                else
+                {
+                    qDebug("CTRL+O");
+                    onMenuActionOpen();
+                }
+            break;
+            case Qt::Key_S:
+                qDebug("CTRL+S");
+                onMenuActionSave();
+            break;
+        }
+}
+
+void MainWindow::processEventByPreset2(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_F2:
+            qDebug("F2");
+            onMenuActionNew();
+            break;
+        case Qt::Key_F3:
+            qDebug("F3");
+            onMenuActionOpen();
+            break;
+        case Qt::Key_F4:
+            qDebug("F4");
+            onMenuActionOpenReadOnly();
+            break;
+        case Qt::Key_F5:
+            qDebug("F5");
+            onMenuActionSave();
+            break;
+    }
 }
 
 //-----------------------------------------------------------------------------------------
@@ -168,6 +246,7 @@ void MainWindow::onMenuActionNew()
     actionSave->setDisabled(false);
     textEdit->setReadOnly(false);
     textEdit->setPlainText("");
+    isReadOnlyLoaded = false;
 }
 
 void MainWindow::onMenuActionOpen()
@@ -182,14 +261,15 @@ void MainWindow::onMenuActionOpenReadOnly()
 
 void MainWindow::onMenuActionSave()
 {
+    if (isReadOnlyLoaded)
+        return;
+
     QString saveFilePath = QFileDialog::getSaveFileName(
                 this,
                 tr("Save file"),
                 QDir::current().path(),
                 tr("Text file (*.txt)")
     );
-
-    qDebug() << saveFilePath;
 
     if (saveFilePath.isEmpty())
         return;
@@ -215,6 +295,16 @@ void MainWindow::onMenuActionEnglish()
 void MainWindow::onMenuActionRussian()
 {
     retranslate("ru");
+}
+
+void MainWindow::onMenuActionHotkeysPreset1()
+{
+    doUseHotkeysPreset2 = false;
+}
+
+void MainWindow::onMenuActionHotkeysPreset2()
+{
+    doUseHotkeysPreset2 = true;
 }
 
 void MainWindow::onMenuActionAbout()
@@ -245,6 +335,17 @@ void MainWindow::onMenuActionAbout()
     }
     else
         aboutWindow->show();
+}
+
+//-----------------------------------------------------------------------------------------
+//EVENTS
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (doUseHotkeysPreset2)
+        processEventByPreset2(event);
+    else
+        processEventByPreset1(event);
 }
 
 //-----------------------------------------------------------------------------------------

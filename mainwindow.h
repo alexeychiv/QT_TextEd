@@ -27,9 +27,17 @@ class MainWindow : public QMainWindow
     QAction *actionSave;
     QAction *actionQuit;
 
+    bool isReadOnlyLoaded;
+
     QMenu *menuLanguage;
     QAction *actionEnglish;
     QAction *actionRussian;
+
+    bool doUseHotkeysPreset2;
+
+    QMenu *menuHotkeys;
+    QAction *actionHotkeysPreset1;
+    QAction *actionHotkeysPreset2;
 
     QMenu *menuHelp;
     QAction *actionAbout;
@@ -48,6 +56,9 @@ private:
     void retranslate(const QString& languageCode);
     void setElementsStrings();
 
+    void processEventByPreset1(QKeyEvent *event);
+    void processEventByPreset2(QKeyEvent *event);
+
 public slots:
     void onMenuActionNew();
     void onMenuActionOpen();
@@ -58,7 +69,13 @@ public slots:
     void onMenuActionEnglish();
     void onMenuActionRussian();
 
+    void onMenuActionHotkeysPreset1();
+    void onMenuActionHotkeysPreset2();
+
     void onMenuActionAbout();
 
+    //EVENTS
+
+    void keyPressEvent(QKeyEvent *event) override;
 };
 #endif // MAINWINDOW_H
