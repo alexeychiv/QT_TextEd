@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <QApplication>
+
 
 //-----------------------------------------------------------------------------------------
 //CONSTRUCTOR
@@ -27,65 +29,72 @@ void MainWindow::setupUI()
 
     //MAIN MENU
     menubar = new QMenuBar(this);
-    menubar->setObjectName(QString::fromUtf8("menubar"));
     menubar->setGeometry(QRect(0, 0, 800, 21));
 
     //FILE MENU
     menuFile = new QMenu(menubar);
-    menuFile->setObjectName(QString::fromUtf8("menuFile"));
-    menuFile->setTitle("File");
 
+    actionNew = new QAction(this);
     actionOpen = new QAction(this);
-    actionOpen->setText("Open");
-
     actionOpenReadOnly = new QAction(this);
-    actionOpenReadOnly->setText("Open Read Only");
-
     actionSave = new QAction(this);
-    actionSave->setText("Save");
-
     actionQuit = new QAction(this);
-    actionQuit->setText("Quit");
 
+    menuFile->addAction(actionNew);
     menuFile->addAction(actionOpen);
     menuFile->addAction(actionOpenReadOnly);
     menuFile->addAction(actionSave);
     menuFile->addAction(actionQuit);
 
+    //LANGUAGE MENU
+    menuLanguage = new QMenu(menubar);
+
+    actionEnglish = new QAction(this);
+    actionRussian = new QAction(this);
+
+    menuLanguage->addAction(actionEnglish);
+    menuLanguage->addAction(actionRussian);
+
     //HELP MENU
     menuHelp = new QMenu(menubar);
-    menuHelp->setTitle("Help");
 
     actionAbout = new QAction(this);
-    actionAbout->setText("About");
 
     menuHelp->addAction(actionAbout);
 
+    //------------
     menubar->addAction(menuFile->menuAction());
+    menubar->addAction(menuLanguage->menuAction());
     menubar->addAction(menuHelp->menuAction());
 
     setMenuBar(menubar);
 
+    QWidget::connect(actionNew, &QAction::triggered, this, &MainWindow::onMenuActionNew);
     QWidget::connect(actionOpen, &QAction::triggered, this, &MainWindow::onMenuActionOpen);
     QWidget::connect(actionOpenReadOnly, &QAction::triggered, this, &MainWindow::onMenuActionOpenReadOnly);
     QWidget::connect(actionSave, &QAction::triggered, this, &MainWindow::onMenuActionSave);
     QWidget::connect(actionQuit, &QAction::triggered, this, &MainWindow::onMenuActionQuit);
+
+    QWidget::connect(actionEnglish, &QAction::triggered, this, &MainWindow::onMenuActionEnglish);
+    QWidget::connect(actionRussian, &QAction::triggered, this, &MainWindow::onMenuActionRussian);
+
     QWidget::connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
 
     textEdit = new QPlainTextEdit(this);
     setCentralWidget(textEdit);
+    setElementsStrings();
 }
 
 //-----------------------------------------------------------------------------------------
 //UTILS
 
-void MainWindow::loadFile(bool isReadOnly)
+void MainWindow::loadFile(const bool isReadOnly)
 {
     QString openFilePath = QFileDialog::getOpenFileName(
                 this,
-                "Open file",
+                tr("Open file"),
                 QDir::current().path(),
-                "Text file (*.txt)"
+                tr("Text file (*.txt)")
     );
 
     qDebug() << openFilePath;
@@ -101,7 +110,7 @@ void MainWindow::loadFile(bool isReadOnly)
 
         if (isReadOnly)
         {
-            setWindowTitle("TextEd - **READ ONLY** " + QFileInfo(openFilePath).fileName());
+            setWindowTitle(tr("TextEd - **READ ONLY** ") + QFileInfo(openFilePath).fileName());
             actionSave->setDisabled(true);
             textEdit->setReadOnly(true);
         }
@@ -114,8 +123,52 @@ void MainWindow::loadFile(bool isReadOnly)
     }
 }
 
+void MainWindow::retranslate(const QString &languageCode)
+{
+    static QString currentLanguageCode = "";
+
+    if (currentLanguageCode == languageCode)
+        return;
+
+    currentLanguageCode = languageCode;
+
+    if (languageCode == "en")
+        qApp->removeTranslator(&translator);
+    else
+    {
+        if (!translator.load(":/QtLanguage_" + languageCode))
+           qDebug("ERROR: unable to load translation!");
+        qApp->installTranslator(&translator);
+    }
+
+    setElementsStrings();
+}
+
+void MainWindow::setElementsStrings()
+{
+    menuFile->setTitle(tr("File"));
+    actionNew->setText(tr("New"));
+    actionOpen->setText(tr("Open"));
+    actionOpenReadOnly->setText(tr("Open Read Only"));
+    actionSave->setText(tr("Save"));
+    actionQuit->setText(tr("Quit"));
+    menuLanguage->setTitle(tr("Language"));
+    actionEnglish->setText(tr("English"));
+    actionRussian->setText(tr("Russian"));
+    menuHelp->setTitle(tr("Help"));
+    actionAbout->setText(tr("About"));
+}
+
 //-----------------------------------------------------------------------------------------
 //SLOTS
+
+void MainWindow::onMenuActionNew()
+{
+    setWindowTitle("TextEd");
+    actionSave->setDisabled(false);
+    textEdit->setReadOnly(false);
+    textEdit->setPlainText("");
+}
 
 void MainWindow::onMenuActionOpen()
 {
@@ -131,9 +184,9 @@ void MainWindow::onMenuActionSave()
 {
     QString saveFilePath = QFileDialog::getSaveFileName(
                 this,
-                "Save file",
+                tr("Save file"),
                 QDir::current().path(),
-                "Text file (*.txt)"
+                tr("Text file (*.txt)")
     );
 
     qDebug() << saveFilePath;
@@ -154,6 +207,16 @@ void MainWindow::onMenuActionQuit()
     this->close();
 }
 
+void MainWindow::onMenuActionEnglish()
+{
+    retranslate("en");
+}
+
+void MainWindow::onMenuActionRussian()
+{
+    retranslate("ru");
+}
+
 void MainWindow::onMenuActionAbout()
 {
     static QMainWindow* aboutWindow = nullptr;
@@ -167,7 +230,7 @@ void MainWindow::onMenuActionAbout()
             if (aboutWindow == nullptr)
             {
                 aboutWindow = new QMainWindow(this);
-                aboutWindow->setWindowTitle("About TextEd");
+                aboutWindow->setWindowTitle(tr("About TextEd"));
                 aboutWindow->resize(320, 240);
 
                 QPlainTextEdit* aboutTextEdit = new QPlainTextEdit(aboutWindow);

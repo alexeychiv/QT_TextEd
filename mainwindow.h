@@ -9,18 +9,27 @@
 #include <QFile>
 #include <QTextStream>
 
+#include <QTranslator>
+
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    QTranslator translator;
+
     QMenuBar *menubar;
 
     QMenu *menuFile;
+    QAction *actionNew;
     QAction *actionOpen;
     QAction *actionOpenReadOnly;
     QAction *actionSave;
     QAction *actionQuit;
+
+    QMenu *menuLanguage;
+    QAction *actionEnglish;
+    QAction *actionRussian;
 
     QMenu *menuHelp;
     QAction *actionAbout;
@@ -35,13 +44,20 @@ private:
     void setupUI();
 
     //UTILS
-    void loadFile(bool isReadOnly);
+    void loadFile(const bool isReadOnly);
+    void retranslate(const QString& languageCode);
+    void setElementsStrings();
 
 public slots:
+    void onMenuActionNew();
     void onMenuActionOpen();
     void onMenuActionOpenReadOnly();
     void onMenuActionSave();
     void onMenuActionQuit();
+
+    void onMenuActionEnglish();
+    void onMenuActionRussian();
+
     void onMenuActionAbout();
 
 };
