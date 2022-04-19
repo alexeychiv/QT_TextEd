@@ -31,6 +31,7 @@ public:
 
 private:
     void setupUI();
+    void showAboutWindow();
 
 public slots:
     void onMenuActionOpen();

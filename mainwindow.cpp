@@ -22,6 +22,11 @@ void MainWindow::setupUI()
     resize(800, 600);
     setWindowTitle("TextEd");
 
+    //MAIN MENU
+    menubar = new QMenuBar(this);
+    menubar->setObjectName(QString::fromUtf8("menubar"));
+    menubar->setGeometry(QRect(0, 0, 800, 21));
+
     //FILE MENU
     menuFile = new QMenu(menubar);
     menuFile->setObjectName(QString::fromUtf8("menuFile"));
@@ -49,11 +54,6 @@ void MainWindow::setupUI()
 
     menuHelp->addAction(actionAbout);
 
-    //MAIN MENU
-    menubar = new QMenuBar(this);
-    menubar->setObjectName(QString::fromUtf8("menubar"));
-    menubar->setGeometry(QRect(0, 0, 800, 21));
-
     menubar->addAction(menuFile->menuAction());
     menubar->addAction(menuHelp->menuAction());
 
@@ -65,6 +65,11 @@ void MainWindow::setupUI()
 
     textEdit = new QPlainTextEdit(this);
     setCentralWidget(textEdit);
+}
+
+void MainWindow::showAboutWindow()
+{
+
 }
 
 void MainWindow::onMenuActionOpen()
@@ -113,20 +118,32 @@ void MainWindow::onMenuActionSave()
 
 void MainWindow::onMenuActionAbout()
 {
-    QFile aboutFile(":/about.txt");
+    static QMainWindow* aboutWindow = nullptr;
 
-    if (aboutFile.open(QFile::ReadOnly))
+    if (aboutWindow == nullptr)
     {
-        QMainWindow* aboutWindow = new QMainWindow(this);
-        aboutWindow->setWindowTitle("About TextEd");
+        QFile aboutFile(":/about.txt");
 
-        QPlainTextEdit* aboutTextEdit = new QPlainTextEdit(aboutWindow);
-        aboutTextEdit->setPlainText(QTextStream(&aboutFile).readAll());
+        if (aboutFile.open(QFile::ReadOnly))
+        {
+            if (aboutWindow == nullptr)
+            {
+                aboutWindow = new QMainWindow(this);
+                aboutWindow->setWindowTitle("About TextEd");
+                aboutWindow->resize(320, 240);
 
-        aboutWindow->setCentralWidget(aboutTextEdit);
+                QPlainTextEdit* aboutTextEdit = new QPlainTextEdit(aboutWindow);
+                aboutTextEdit->setPlainText(QTextStream(&aboutFile).readAll());
+                aboutTextEdit->setReadOnly(true);
 
-        aboutWindow->show();
+                aboutWindow->setCentralWidget(aboutTextEdit);
+                aboutWindow->show();
+                return;
+            }
+        }
     }
+    else
+        aboutWindow->show();
 }
 
 //-----------------------------------------------------------------------------------------
