@@ -39,6 +39,10 @@ class MainWindow : public QMainWindow
     QAction *actionHotkeysPreset1;
     QAction *actionHotkeysPreset2;
 
+    QMenu *menuThemes;
+    QAction *actionLightTheme;
+    QAction *actionDarkTheme;
+
     QMenu *menuHelp;
     QAction *actionAbout;
 
@@ -73,6 +77,9 @@ public slots:
 
     void onMenuActionHotkeysPreset1();
     void onMenuActionHotkeysPreset2();
+
+    void onMenuActionLightTheme();
+    void onMenuActionDarkTheme();
 
     void onMenuActionAbout();
 

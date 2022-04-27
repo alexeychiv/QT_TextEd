@@ -9,7 +9,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       isReadOnlyLoaded(false),
-      doUseHotkeysPreset2(false)
+      doUseHotkeysPreset2(false),
+      aboutWindow(nullptr)
 {
     setupUI();
 }
@@ -72,6 +73,15 @@ void MainWindow::setupUI()
     menuHotkeys->addAction(actionHotkeysPreset1);
     menuHotkeys->addAction(actionHotkeysPreset2);
 
+    //THEMES MENU
+    menuThemes = new QMenu(menubar);
+
+    actionLightTheme = new QAction(this);
+    actionDarkTheme = new QAction(this);
+
+    menuThemes->addAction(actionLightTheme);
+    menuThemes->addAction(actionDarkTheme);
+
     //HELP MENU
     menuHelp = new QMenu(menubar);
 
@@ -83,6 +93,7 @@ void MainWindow::setupUI()
     menubar->addAction(menuFile->menuAction());
     menubar->addAction(menuLanguage->menuAction());
     menubar->addAction(menuHotkeys->menuAction());
+    menubar->addAction(menuThemes->menuAction());
     menubar->addAction(menuHelp->menuAction());
 
     setMenuBar(menubar);
@@ -99,11 +110,16 @@ void MainWindow::setupUI()
     QWidget::connect(actionHotkeysPreset1, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset1);
     QWidget::connect(actionHotkeysPreset2, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset2);
 
+    QWidget::connect(actionLightTheme, &QAction::triggered, this, &MainWindow::onMenuActionLightTheme);
+    QWidget::connect(actionDarkTheme, &QAction::triggered, this, &MainWindow::onMenuActionDarkTheme);
+
     QWidget::connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
 
     textEdit = new QPlainTextEdit(this);
     setCentralWidget(textEdit);
     setElementsStrings();
+
+    onMenuActionLightTheme();
 }
 
 //-----------------------------------------------------------------------------------------
@@ -181,6 +197,10 @@ void MainWindow::setElementsStrings()
     menuHotkeys->setTitle(tr("Hotkeys Setup"));
     actionHotkeysPreset1->setText(tr("Preset 1"));
     actionHotkeysPreset2->setText(tr("Preset 2"));
+
+    menuThemes->setTitle(tr("Themes"));
+    actionLightTheme->setText(tr("Light"));
+    actionDarkTheme->setText(tr("Dark"));
 
     menuHelp->setTitle(tr("Help"));
     actionAbout->setText(tr("About"));
@@ -305,6 +325,26 @@ void MainWindow::onMenuActionHotkeysPreset1()
 void MainWindow::onMenuActionHotkeysPreset2()
 {
     doUseHotkeysPreset2 = true;
+}
+
+void MainWindow::onMenuActionLightTheme()
+{
+    setStyleSheet(
+                "QWidget {"
+                "   color: black;"
+                "   background-color: white;"
+                "}"
+    );
+}
+
+void MainWindow::onMenuActionDarkTheme()
+{
+    setStyleSheet(
+                "QWidget {"
+                "   color: white;"
+                "   background-color: black;"
+                "}"
+    );
 }
 
 void MainWindow::onMenuActionAbout()
