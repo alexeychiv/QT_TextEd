@@ -42,6 +42,8 @@ class MainWindow : public QMainWindow
     QMenu *menuHelp;
     QAction *actionAbout;
 
+    QMainWindow* aboutWindow;
+
     QPlainTextEdit *textEdit;
 
 public:

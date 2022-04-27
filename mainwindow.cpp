@@ -309,8 +309,6 @@ void MainWindow::onMenuActionHotkeysPreset2()
 
 void MainWindow::onMenuActionAbout()
 {
-    static QMainWindow* aboutWindow = nullptr;
-
     if (aboutWindow == nullptr)
     {
         QFile aboutFile(":/about.txt");
