@@ -84,11 +84,9 @@ void TextDocumentSubwindow::saveToFile(const QString &saveFilePath)
 void TextDocumentSubwindow::print()
 {
     QPrinter printer;
-    printer.setOutputFormat(QPrinter::PdfFormat);
     QPrintDialog dlg(&printer, this);
     dlg.setWindowTitle("Print");
     if (dlg.exec() != QDialog::Accepted)
         return;
     plainTextEdit->document()->print(&printer);
-
 }
