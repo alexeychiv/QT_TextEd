@@ -40,12 +40,14 @@ void MainWindow::setupUI()
     actionOpen = new QAction(this);
     actionOpenReadOnly = new QAction(this);
     actionSave = new QAction(this);
+    actionPrint = new QAction(this);
     actionQuit = new QAction(this);
 
     menuFile->addAction(actionNew);
     menuFile->addAction(actionOpen);
     menuFile->addAction(actionOpenReadOnly);
     menuFile->addAction(actionSave);
+    menuFile->addAction(actionPrint);
     menuFile->addAction(actionQuit);
 
     //LANGUAGE MENU
@@ -102,6 +104,7 @@ void MainWindow::setupUI()
     connect(actionOpen, &QAction::triggered, this, &MainWindow::onMenuActionOpen);
     connect(actionOpenReadOnly, &QAction::triggered, this, &MainWindow::onMenuActionOpenReadOnly);
     connect(actionSave, &QAction::triggered, this, &MainWindow::onMenuActionSave);
+    connect(actionPrint, &QAction::triggered, this, &MainWindow::onMenuActionPrint);
     connect(actionQuit, &QAction::triggered, this, &MainWindow::onMenuActionQuit);
 
     connect(actionEnglish, &QAction::triggered, this, &MainWindow::onMenuActionEnglish);
@@ -114,8 +117,6 @@ void MainWindow::setupUI()
     connect(actionDarkTheme, &QAction::triggered, this, &MainWindow::onMenuActionDarkTheme);
 
     connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
-
-    connect(mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::onSubWindowActivated);
 
     //-------------
     setElementsStrings();
@@ -171,6 +172,7 @@ void MainWindow::setElementsStrings()
     actionOpen->setText(tr("Open"));
     actionOpenReadOnly->setText(tr("Open Read Only"));
     actionSave->setText(tr("Save"));
+    actionPrint->setText(tr("Print"));
     actionQuit->setText(tr("Quit"));
 
     menuLanguage->setTitle(tr("Language"));
@@ -262,6 +264,11 @@ void MainWindow::onMenuActionOpenReadOnly()
 
 void MainWindow::onMenuActionSave()
 {
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+
+    if (!currentActiveSubwindow)
+        return;
+
     if (currentActiveSubwindow->isReadOnlyState())
         return;
 
@@ -276,6 +283,13 @@ void MainWindow::onMenuActionSave()
         return;
 
     currentActiveSubwindow->saveToFile(saveFilePath);
+}
+
+void MainWindow::onMenuActionPrint()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (currentActiveSubwindow)
+        currentActiveSubwindow->print();
 }
 
 void MainWindow::onMenuActionQuit()
@@ -349,19 +363,6 @@ void MainWindow::onMenuActionAbout()
     }
     else
         aboutWindow->show();
-}
-
-void MainWindow::onSubWindowActivated(QMdiSubWindow *window)
-{
-    currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(window);
-
-    if (currentActiveSubwindow == nullptr)
-        throw QException();
-
-    if (currentActiveSubwindow->isReadOnlyState())
-        actionSave->setDisabled(true);
-    else
-        actionSave->setDisabled(false);
 }
 
 //-----------------------------------------------------------------------------------------

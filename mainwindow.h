@@ -14,6 +14,7 @@
 #include <QMdiArea>
 #include "textdocumentsubwindow.h"
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,6 +28,7 @@ class MainWindow : public QMainWindow
     QAction *actionOpen;
     QAction *actionOpenReadOnly;
     QAction *actionSave;
+    QAction *actionPrint;
     QAction *actionQuit;
 
     QMenu *menuLanguage;
@@ -49,7 +51,6 @@ class MainWindow : public QMainWindow
     QMainWindow* aboutWindow;
 
     QMdiArea* mdiArea;
-    TextDocumentSubwindow* currentActiveSubwindow;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -71,6 +72,7 @@ public slots:
     void onMenuActionOpen();
     void onMenuActionOpenReadOnly();
     void onMenuActionSave();
+    void onMenuActionPrint();
     void onMenuActionQuit();
 
     void onMenuActionEnglish();
@@ -83,8 +85,6 @@ public slots:
     void onMenuActionDarkTheme();
 
     void onMenuActionAbout();
-
-    void onSubWindowActivated(QMdiSubWindow *window);
 
     //EVENTS
 

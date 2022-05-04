@@ -4,6 +4,9 @@
 #include <QMdiSubWindow>
 #include <QPlainTextEdit>
 
+#include <QPrinter>
+#include <QPrintDialog>
+
 
 class TextDocumentSubwindow : public QMdiSubWindow
 {
@@ -23,6 +26,7 @@ public:
     void openFile(const QString& openFilePath);
     void openFileReadOnly(const QString& openFilePath);
     void saveToFile(const QString& saveFilePath);
+    void print();
 };
 
 #endif // TEXTDOCUMENTSUBWINDOW_H
