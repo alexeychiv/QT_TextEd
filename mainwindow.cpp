@@ -1,14 +1,13 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-
+#include <QException>
 
 //-----------------------------------------------------------------------------------------
 //CONSTRUCTOR
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      isReadOnlyLoaded(false),
       doUseHotkeysPreset2(false),
       aboutWindow(nullptr)
 {
@@ -27,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupUI()
 {
-    resize(800, 600);
+    resize(1024, 820);
     setWindowTitle("TextEd");
 
     //MAIN MENU
@@ -42,12 +41,6 @@ void MainWindow::setupUI()
     actionOpenReadOnly = new QAction(this);
     actionSave = new QAction(this);
     actionQuit = new QAction(this);
-
-//    actionNew->setShortcut(Qt::CTRL | Qt::Key_N);
-//    actionOpen->setShortcut(Qt::CTRL | Qt::Key_O);
-//    actionOpenReadOnly->setShortcut(Qt::CTRL | Qt::SHIFT| Qt::Key_O);
-//    actionSave->setShortcut(Qt::CTRL | Qt::Key_S);
-//    actionQuit->setShortcut(Qt::CTRL | Qt::Key_Q);
 
     menuFile->addAction(actionNew);
     menuFile->addAction(actionOpen);
@@ -98,25 +91,33 @@ void MainWindow::setupUI()
 
     setMenuBar(menubar);
 
-    QWidget::connect(actionNew, &QAction::triggered, this, &MainWindow::onMenuActionNew);
-    QWidget::connect(actionOpen, &QAction::triggered, this, &MainWindow::onMenuActionOpen);
-    QWidget::connect(actionOpenReadOnly, &QAction::triggered, this, &MainWindow::onMenuActionOpenReadOnly);
-    QWidget::connect(actionSave, &QAction::triggered, this, &MainWindow::onMenuActionSave);
-    QWidget::connect(actionQuit, &QAction::triggered, this, &MainWindow::onMenuActionQuit);
+    //MDI AREA
+    mdiArea = new QMdiArea(this);
+    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setCentralWidget(mdiArea);
 
-    QWidget::connect(actionEnglish, &QAction::triggered, this, &MainWindow::onMenuActionEnglish);
-    QWidget::connect(actionRussian, &QAction::triggered, this, &MainWindow::onMenuActionRussian);
+    //CONNECTING SLOTS
+    connect(actionNew, &QAction::triggered, this, &MainWindow::onMenuActionNew);
+    connect(actionOpen, &QAction::triggered, this, &MainWindow::onMenuActionOpen);
+    connect(actionOpenReadOnly, &QAction::triggered, this, &MainWindow::onMenuActionOpenReadOnly);
+    connect(actionSave, &QAction::triggered, this, &MainWindow::onMenuActionSave);
+    connect(actionQuit, &QAction::triggered, this, &MainWindow::onMenuActionQuit);
 
-    QWidget::connect(actionHotkeysPreset1, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset1);
-    QWidget::connect(actionHotkeysPreset2, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset2);
+    connect(actionEnglish, &QAction::triggered, this, &MainWindow::onMenuActionEnglish);
+    connect(actionRussian, &QAction::triggered, this, &MainWindow::onMenuActionRussian);
 
-    QWidget::connect(actionLightTheme, &QAction::triggered, this, &MainWindow::onMenuActionLightTheme);
-    QWidget::connect(actionDarkTheme, &QAction::triggered, this, &MainWindow::onMenuActionDarkTheme);
+    connect(actionHotkeysPreset1, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset1);
+    connect(actionHotkeysPreset2, &QAction::triggered, this, &MainWindow::onMenuActionHotkeysPreset2);
 
-    QWidget::connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
+    connect(actionLightTheme, &QAction::triggered, this, &MainWindow::onMenuActionLightTheme);
+    connect(actionDarkTheme, &QAction::triggered, this, &MainWindow::onMenuActionDarkTheme);
 
-    textEdit = new QPlainTextEdit(this);
-    setCentralWidget(textEdit);
+    connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
+
+    connect(mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::onSubWindowActivated);
+
+    //-------------
     setElementsStrings();
 
     onMenuActionLightTheme();
@@ -137,27 +138,9 @@ void MainWindow::loadFile(const bool isReadOnly)
     if (openFilePath.isEmpty())
         return;
 
-    QFile openFile(openFilePath);
-
-    if (openFile.open(QFile::ReadOnly))
-    {
-        textEdit->setPlainText(QTextStream(&openFile).readAll());
-
-        if (isReadOnly)
-        {
-            setWindowTitle(tr("TextEd - **READ ONLY** ") + QFileInfo(openFilePath).fileName());
-            actionSave->setDisabled(true);
-            textEdit->setReadOnly(true);
-            isReadOnlyLoaded = true;
-        }
-        else
-        {
-            setWindowTitle("TextEd - " + QFileInfo(openFilePath).fileName());
-            actionSave->setDisabled(false);
-            textEdit->setReadOnly(false);
-            isReadOnlyLoaded = false;
-        }
-    }
+    TextDocumentSubwindow* newTextDocumentSubwindow = new TextDocumentSubwindow(mdiArea, openFilePath, isReadOnly);
+    mdiArea->addSubWindow(newTextDocumentSubwindow);
+    newTextDocumentSubwindow->show();
 }
 
 void MainWindow::retranslate(const QString &languageCode)
@@ -262,11 +245,9 @@ void MainWindow::processEventByPreset2(QKeyEvent *event)
 
 void MainWindow::onMenuActionNew()
 {
-    setWindowTitle("TextEd");
-    actionSave->setDisabled(false);
-    textEdit->setReadOnly(false);
-    textEdit->setPlainText("");
-    isReadOnlyLoaded = false;
+    TextDocumentSubwindow* newTextDocumentSubwindow = new TextDocumentSubwindow(mdiArea);
+    mdiArea->addSubWindow(newTextDocumentSubwindow);
+    newTextDocumentSubwindow->show();
 }
 
 void MainWindow::onMenuActionOpen()
@@ -281,7 +262,7 @@ void MainWindow::onMenuActionOpenReadOnly()
 
 void MainWindow::onMenuActionSave()
 {
-    if (isReadOnlyLoaded)
+    if (currentActiveSubwindow->isReadOnlyState())
         return;
 
     QString saveFilePath = QFileDialog::getSaveFileName(
@@ -294,12 +275,7 @@ void MainWindow::onMenuActionSave()
     if (saveFilePath.isEmpty())
         return;
 
-    QFile saveFile(saveFilePath);
-
-    if (saveFile.open(QFile::WriteOnly))
-    {
-        QTextStream(&saveFile) << textEdit->toPlainText();
-    }
+    currentActiveSubwindow->saveToFile(saveFilePath);
 }
 
 void MainWindow::onMenuActionQuit()
@@ -373,6 +349,19 @@ void MainWindow::onMenuActionAbout()
     }
     else
         aboutWindow->show();
+}
+
+void MainWindow::onSubWindowActivated(QMdiSubWindow *window)
+{
+    currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(window);
+
+    if (currentActiveSubwindow == nullptr)
+        throw QException();
+
+    if (currentActiveSubwindow->isReadOnlyState())
+        actionSave->setDisabled(true);
+    else
+        actionSave->setDisabled(false);
 }
 
 //-----------------------------------------------------------------------------------------

@@ -11,6 +11,8 @@
 
 #include <QTranslator>
 
+#include <QMdiArea>
+#include "textdocumentsubwindow.h"
 
 class MainWindow : public QMainWindow
 {
@@ -26,8 +28,6 @@ class MainWindow : public QMainWindow
     QAction *actionOpenReadOnly;
     QAction *actionSave;
     QAction *actionQuit;
-
-    bool isReadOnlyLoaded;
 
     QMenu *menuLanguage;
     QAction *actionEnglish;
@@ -48,7 +48,8 @@ class MainWindow : public QMainWindow
 
     QMainWindow* aboutWindow;
 
-    QPlainTextEdit *textEdit;
+    QMdiArea* mdiArea;
+    TextDocumentSubwindow* currentActiveSubwindow;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -82,6 +83,8 @@ public slots:
     void onMenuActionDarkTheme();
 
     void onMenuActionAbout();
+
+    void onSubWindowActivated(QMdiSubWindow *window);
 
     //EVENTS
 
