@@ -36,7 +36,14 @@ public:
     QTextCharFormat getFormatFromSelection() { return textEdit->textCursor().charFormat(); }
     void applyFormatToSelection(const QTextCharFormat& newFormat) { textEdit->textCursor().setCharFormat(newFormat); }
 
-
+    void setAligment(Qt::AlignmentFlag alignmentFlag)
+    {
+        QTextCursor cursor = textEdit->textCursor();
+        QTextBlockFormat textBlockFormat = cursor.blockFormat();
+        textBlockFormat.setAlignment(alignmentFlag);
+        cursor.mergeBlockFormat(textBlockFormat);
+        textEdit->setTextCursor(cursor);
+    }
 };
 
 #endif // TEXTDOCUMENTSUBWINDOW_H

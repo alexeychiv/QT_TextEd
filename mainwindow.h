@@ -60,6 +60,9 @@ class MainWindow : public QMainWindow
     QAction* actionFont;
     QAction* actionBold;
     QAction* actionItalic;
+    QAction* actionAlignLeft;
+    QAction* actionAlignCenter;
+    QAction* actionAlignRight;
     QAction* actionCopyFormat;
     QAction* actionApplyFormat;
 
@@ -102,6 +105,9 @@ public slots:
     void onToolbarActionFont();
     void onToolbarActionBold();
     void onToolbarActionItalic();
+    void onToolbarActionAlignLeft();
+    void onToolbarActionAlignCenter();
+    void onToolbarActionAlignRight();
     void onToolbarActionCopyFormat();
     void onToolbarActionApplyFormat();
     //EVENTS

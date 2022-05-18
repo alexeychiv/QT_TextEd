@@ -106,6 +106,9 @@ void MainWindow::setupUI()
     actionFont = new QAction(this);
     actionBold = new QAction(this);
     actionItalic = new QAction(this);
+    actionAlignLeft = new QAction(this);
+    actionAlignCenter = new QAction(this);
+    actionAlignRight = new QAction(this);
     actionCopyFormat = new QAction(this);
     actionApplyFormat = new QAction(this);
 
@@ -113,6 +116,10 @@ void MainWindow::setupUI()
     toolBar->addSeparator();
     toolBar->addAction(actionBold);
     toolBar->addAction(actionItalic);
+    toolBar->addSeparator();
+    toolBar->addAction(actionAlignLeft);
+    toolBar->addAction(actionAlignCenter);
+    toolBar->addAction(actionAlignRight);
     toolBar->addSeparator();
     toolBar->addAction(actionCopyFormat);
     toolBar->addAction(actionApplyFormat);
@@ -141,6 +148,9 @@ void MainWindow::setupUI()
     connect(actionFont, &QAction::triggered, this, &MainWindow::onToolbarActionFont);
     connect(actionBold, &QAction::triggered, this, &MainWindow::onToolbarActionBold);
     connect(actionItalic, &QAction::triggered, this, &MainWindow::onToolbarActionItalic);
+    connect(actionAlignLeft, &QAction::triggered, this, &MainWindow::onToolbarActionAlignLeft);
+    connect(actionAlignCenter, &QAction::triggered, this, &MainWindow::onToolbarActionAlignCenter);
+    connect(actionAlignRight, &QAction::triggered, this, &MainWindow::onToolbarActionAlignRight);
     connect(actionCopyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionCopyFormat);
     connect(actionApplyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionApplyFormat);
     //-------------
@@ -218,6 +228,9 @@ void MainWindow::setElementsStrings()
     actionFont->setText(tr("Font"));
     actionBold->setText(tr("Bold"));
     actionItalic->setText(tr("Italic"));
+    actionAlignLeft->setText(tr("Align Left"));
+    actionAlignCenter->setText(tr("Align Center"));
+    actionAlignRight->setText(tr("Align Right"));
     actionCopyFormat->setText(tr("Copy format"));
     actionApplyFormat->setText(tr("Apply format"));
 }
@@ -440,6 +453,33 @@ void MainWindow::onToolbarActionItalic()
     format.setFont(font);
 
     currentActiveSubwindow->applyFormatToSelection(format);
+}
+
+void MainWindow::onToolbarActionAlignLeft()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    currentActiveSubwindow->setAligment(Qt::AlignLeft);
+}
+
+void MainWindow::onToolbarActionAlignCenter()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    currentActiveSubwindow->setAligment(Qt::AlignCenter);
+}
+
+void MainWindow::onToolbarActionAlignRight()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    currentActiveSubwindow->setAligment(Qt::AlignRight);
 }
 
 void MainWindow::onToolbarActionCopyFormat()
