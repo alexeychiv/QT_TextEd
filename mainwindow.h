@@ -16,6 +16,7 @@
 
 #include <QToolBar>
 #include <QFontDialog>
+#include <QTextCharFormat>
 
 
 class MainWindow : public QMainWindow
@@ -57,6 +58,12 @@ class MainWindow : public QMainWindow
 
     QToolBar* toolBar;
     QAction* actionFont;
+    QAction* actionBold;
+    QAction* actionItalic;
+    QAction* actionCopyFormat;
+    QAction* actionApplyFormat;
+
+    QTextCharFormat formatBuffer;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -93,6 +100,10 @@ public slots:
     void onMenuActionAbout();
 
     void onToolbarActionFont();
+    void onToolbarActionBold();
+    void onToolbarActionItalic();
+    void onToolbarActionCopyFormat();
+    void onToolbarActionApplyFormat();
     //EVENTS
 
     void keyPressEvent(QKeyEvent *event) override;

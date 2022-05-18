@@ -8,6 +8,7 @@
 #include <QPrintDialog>
 
 #include <QFont>
+#include <QTextCharFormat>
 
 class TextDocumentSubwindow : public QMdiSubWindow
 {
@@ -31,6 +32,11 @@ public:
 
     void setFont(const QFont& newFont) { textEdit->setFont(newFont); }
     const QFont& getFont() const { return textEdit->font(); }
+
+    QTextCharFormat getFormatFromSelection() { return textEdit->textCursor().charFormat(); }
+    void applyFormatToSelection(const QTextCharFormat& newFormat) { textEdit->textCursor().setCharFormat(newFormat); }
+
+
 };
 
 #endif // TEXTDOCUMENTSUBWINDOW_H

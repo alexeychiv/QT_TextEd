@@ -104,8 +104,19 @@ void MainWindow::setupUI()
     toolBar = new QToolBar(this);
 
     actionFont = new QAction(this);
+    actionBold = new QAction(this);
+    actionItalic = new QAction(this);
+    actionCopyFormat = new QAction(this);
+    actionApplyFormat = new QAction(this);
 
     toolBar->addAction(actionFont);
+    toolBar->addSeparator();
+    toolBar->addAction(actionBold);
+    toolBar->addAction(actionItalic);
+    toolBar->addSeparator();
+    toolBar->addAction(actionCopyFormat);
+    toolBar->addAction(actionApplyFormat);
+
     addToolBar(Qt::TopToolBarArea, toolBar);
 
     //CONNECTING SLOTS
@@ -128,6 +139,10 @@ void MainWindow::setupUI()
     connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
 
     connect(actionFont, &QAction::triggered, this, &MainWindow::onToolbarActionFont);
+    connect(actionBold, &QAction::triggered, this, &MainWindow::onToolbarActionBold);
+    connect(actionItalic, &QAction::triggered, this, &MainWindow::onToolbarActionItalic);
+    connect(actionCopyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionCopyFormat);
+    connect(actionApplyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionApplyFormat);
     //-------------
     setElementsStrings();
 
@@ -201,6 +216,10 @@ void MainWindow::setElementsStrings()
     actionAbout->setText(tr("About"));
 
     actionFont->setText(tr("Font"));
+    actionBold->setText(tr("Bold"));
+    actionItalic->setText(tr("Italic"));
+    actionCopyFormat->setText(tr("Copy format"));
+    actionApplyFormat->setText(tr("Apply format"));
 }
 
 void MainWindow::processEventByPreset1(QKeyEvent *event)
@@ -393,6 +412,52 @@ void MainWindow::onToolbarActionFont()
         currentActiveSubwindow->setFont(font);
     }
 
+}
+
+void MainWindow::onToolbarActionBold()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    QTextCharFormat format = currentActiveSubwindow->getFormatFromSelection();
+    QFont font = format.font();
+    font.setBold(!(font.bold()));
+    format.setFont(font);
+
+    currentActiveSubwindow->applyFormatToSelection(format);
+}
+
+void MainWindow::onToolbarActionItalic()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    QTextCharFormat format = currentActiveSubwindow->getFormatFromSelection();
+    QFont font = format.font();
+    font.setItalic(!(font.italic()));
+    format.setFont(font);
+
+    currentActiveSubwindow->applyFormatToSelection(format);
+}
+
+void MainWindow::onToolbarActionCopyFormat()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    formatBuffer = currentActiveSubwindow->getFormatFromSelection();
+}
+
+void MainWindow::onToolbarActionApplyFormat()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    currentActiveSubwindow->applyFormatToSelection(formatBuffer);
 }
 
 //-----------------------------------------------------------------------------------------
