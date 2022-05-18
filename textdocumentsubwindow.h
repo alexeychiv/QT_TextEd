@@ -2,18 +2,19 @@
 #define TEXTDOCUMENTSUBWINDOW_H
 
 #include <QMdiSubWindow>
-#include <QPlainTextEdit>
+#include <QTextEdit>
 
 #include <QPrinter>
 #include <QPrintDialog>
 
+#include <QFont>
 
 class TextDocumentSubwindow : public QMdiSubWindow
 {
     Q_OBJECT
 
     bool isReadOnly;
-    QPlainTextEdit* plainTextEdit;
+    QTextEdit* textEdit;
 
 public:
     explicit TextDocumentSubwindow(QWidget *parent);
@@ -27,6 +28,9 @@ public:
     void openFileReadOnly(const QString& openFilePath);
     void saveToFile(const QString& saveFilePath);
     void print();
+
+    void setFont(const QFont& newFont) { textEdit->setFont(newFont); }
+    const QFont& getFont() const { return textEdit->font(); }
 };
 
 #endif // TEXTDOCUMENTSUBWINDOW_H

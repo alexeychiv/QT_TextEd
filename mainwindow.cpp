@@ -99,6 +99,15 @@ void MainWindow::setupUI()
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
 
+
+    //TOOLBAR
+    toolBar = new QToolBar(this);
+
+    actionFont = new QAction(this);
+
+    toolBar->addAction(actionFont);
+    addToolBar(Qt::TopToolBarArea, toolBar);
+
     //CONNECTING SLOTS
     connect(actionNew, &QAction::triggered, this, &MainWindow::onMenuActionNew);
     connect(actionOpen, &QAction::triggered, this, &MainWindow::onMenuActionOpen);
@@ -118,6 +127,7 @@ void MainWindow::setupUI()
 
     connect(actionAbout, &QAction::triggered, this, &MainWindow::onMenuActionAbout);
 
+    connect(actionFont, &QAction::triggered, this, &MainWindow::onToolbarActionFont);
     //-------------
     setElementsStrings();
 
@@ -189,6 +199,8 @@ void MainWindow::setElementsStrings()
 
     menuHelp->setTitle(tr("Help"));
     actionAbout->setText(tr("About"));
+
+    actionFont->setText(tr("Font"));
 }
 
 void MainWindow::processEventByPreset1(QKeyEvent *event)
@@ -363,6 +375,24 @@ void MainWindow::onMenuActionAbout()
     }
     else
         aboutWindow->show();
+}
+
+void MainWindow::onToolbarActionFont()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    QFont font = currentActiveSubwindow->getFont();
+    QFontDialog fontDialog(font, this);
+
+    bool b[] = {true};
+    font = fontDialog.getFont(b);
+    if (b[0])
+    {
+        currentActiveSubwindow->setFont(font);
+    }
+
 }
 
 //-----------------------------------------------------------------------------------------

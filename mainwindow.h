@@ -14,6 +14,9 @@
 #include <QMdiArea>
 #include "textdocumentsubwindow.h"
 
+#include <QToolBar>
+#include <QFontDialog>
+
 
 class MainWindow : public QMainWindow
 {
@@ -52,6 +55,9 @@ class MainWindow : public QMainWindow
 
     QMdiArea* mdiArea;
 
+    QToolBar* toolBar;
+    QAction* actionFont;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -86,6 +92,7 @@ public slots:
 
     void onMenuActionAbout();
 
+    void onToolbarActionFont();
     //EVENTS
 
     void keyPressEvent(QKeyEvent *event) override;

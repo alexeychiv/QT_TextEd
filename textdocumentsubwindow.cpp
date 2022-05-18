@@ -28,8 +28,8 @@ void TextDocumentSubwindow::setupUI()
 {
     resize(320, 240);
     setWindowTitle(tr("New"));
-    plainTextEdit = new QPlainTextEdit(this);
-    setWidget(plainTextEdit);
+    textEdit = new QTextEdit(this);
+    setWidget(textEdit);
 }
 
 void TextDocumentSubwindow::openFile(const QString &openFilePath)
@@ -43,8 +43,8 @@ void TextDocumentSubwindow::openFile(const QString &openFilePath)
     {
         isReadOnly = false;
         setWindowTitle(openFilePath);
-        plainTextEdit->setPlainText(QTextStream(&openFile).readAll());
-        plainTextEdit->setReadOnly(false);
+        textEdit->setPlainText(QTextStream(&openFile).readAll());
+        textEdit->setReadOnly(false);
     }
 }
 
@@ -59,8 +59,8 @@ void TextDocumentSubwindow::openFileReadOnly(const QString &openFilePath)
     {
         isReadOnly = true;
         setWindowTitle("**READ ONLY** " + openFilePath);
-        plainTextEdit->setPlainText(QTextStream(&openFile).readAll());
-        plainTextEdit->setReadOnly(true);
+        textEdit->setPlainText(QTextStream(&openFile).readAll());
+        textEdit->setReadOnly(true);
     }
 }
 
@@ -77,7 +77,7 @@ void TextDocumentSubwindow::saveToFile(const QString &saveFilePath)
     if (saveFile.open(QFile::WriteOnly))
     {
         setWindowTitle(saveFilePath);
-        QTextStream(&saveFile) << plainTextEdit->toPlainText();
+        QTextStream(&saveFile) << textEdit->toPlainText();
     }
 }
 
@@ -88,5 +88,5 @@ void TextDocumentSubwindow::print()
     dlg.setWindowTitle("Print");
     if (dlg.exec() != QDialog::Accepted)
         return;
-    plainTextEdit->document()->print(&printer);
+    textEdit->document()->print(&printer);
 }
