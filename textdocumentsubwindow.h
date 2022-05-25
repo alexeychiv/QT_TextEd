@@ -10,6 +10,9 @@
 #include <QFont>
 #include <QTextCharFormat>
 
+#include <QDateTime>
+
+
 class TextDocumentSubwindow : public QMdiSubWindow
 {
     Q_OBJECT
@@ -42,6 +45,13 @@ public:
         QTextBlockFormat textBlockFormat = cursor.blockFormat();
         textBlockFormat.setAlignment(alignmentFlag);
         cursor.mergeBlockFormat(textBlockFormat);
+        textEdit->setTextCursor(cursor);
+    }
+
+    void insertDateTime()
+    {
+        QTextCursor cursor = textEdit->textCursor();
+        cursor.insertText(QDateTime::currentDateTime().toString());
         textEdit->setTextCursor(cursor);
     }
 };

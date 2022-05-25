@@ -111,6 +111,7 @@ void MainWindow::setupUI()
     actionAlignRight = new QAction(this);
     actionCopyFormat = new QAction(this);
     actionApplyFormat = new QAction(this);
+    actionInsertDateTime = new QAction(this);
 
     toolBar->addAction(actionFont);
     toolBar->addSeparator();
@@ -123,6 +124,8 @@ void MainWindow::setupUI()
     toolBar->addSeparator();
     toolBar->addAction(actionCopyFormat);
     toolBar->addAction(actionApplyFormat);
+    toolBar->addSeparator();
+    toolBar->addAction(actionInsertDateTime);
 
     addToolBar(Qt::TopToolBarArea, toolBar);
 
@@ -153,6 +156,7 @@ void MainWindow::setupUI()
     connect(actionAlignRight, &QAction::triggered, this, &MainWindow::onToolbarActionAlignRight);
     connect(actionCopyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionCopyFormat);
     connect(actionApplyFormat, &QAction::triggered, this, &MainWindow::onToolbarActionApplyFormat);
+    connect(actionInsertDateTime, &QAction::triggered, this, &MainWindow::onToolbarActionInstertDateTime);
     //-------------
     setElementsStrings();
 
@@ -233,6 +237,7 @@ void MainWindow::setElementsStrings()
     actionAlignRight->setText(tr("Align Right"));
     actionCopyFormat->setText(tr("Copy format"));
     actionApplyFormat->setText(tr("Apply format"));
+    actionInsertDateTime->setText(tr("Insert Date Time"));
 }
 
 void MainWindow::processEventByPreset1(QKeyEvent *event)
@@ -498,6 +503,15 @@ void MainWindow::onToolbarActionApplyFormat()
         return;
 
     currentActiveSubwindow->applyFormatToSelection(formatBuffer);
+}
+
+void MainWindow::onToolbarActionInstertDateTime()
+{
+    TextDocumentSubwindow* currentActiveSubwindow = qobject_cast<TextDocumentSubwindow*>(mdiArea->activeSubWindow());
+    if (!currentActiveSubwindow)
+        return;
+
+    currentActiveSubwindow->insertDateTime();
 }
 
 //-----------------------------------------------------------------------------------------

@@ -65,6 +65,8 @@ class MainWindow : public QMainWindow
     QAction* actionAlignRight;
     QAction* actionCopyFormat;
     QAction* actionApplyFormat;
+    QAction* actionInsertDateTime;
+
 
     QTextCharFormat formatBuffer;
 
@@ -110,6 +112,8 @@ public slots:
     void onToolbarActionAlignRight();
     void onToolbarActionCopyFormat();
     void onToolbarActionApplyFormat();
+    void onToolbarActionInstertDateTime();
+
     //EVENTS
 
     void keyPressEvent(QKeyEvent *event) override;
